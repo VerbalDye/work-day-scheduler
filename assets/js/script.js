@@ -1,6 +1,27 @@
 // set the current date for the header
-var date = moment().format('dddd, MMMM Do')
-$("#currentDay").text(date)
+var date = moment().format('dddd, MMMM Do');
+$("#currentDay").text(date);
+
+var taskSchedule = {};
+
+var setupTask = function() {
+    if (localStorage.getItem("taskSchedule")) {
+        taskSchedule = JSON.parse(localStorage.getItem("taskSchedule"));
+        for (var i = 8; i < 18; i++) {
+            $("#" + i).val(taskSchedule[i]);
+        }
+    } else {
+        for (var i = 8; i < 18; i++) {
+            taskSchedule[i] = "";
+        }
+        localStorage.setItem("taskSchedule", JSON.stringify(taskSchedule));
+    }
+}
+
+var updateLocal = function() {
+    localStorage.setItem("taskSchedule", JSON.stringify(taskSchedule));
+}
+
 
 // goes through each hour and colors it according to it's relation to the current time
 var colorTimes = function() {
@@ -27,10 +48,19 @@ var colorTimes = function() {
     });
 }
 
+$(".time-block").on("click", "button", function() {
+    var textId = $(this).prev().attr("id");
+    var textVal = $(this).prev().val().trim();
+    console.log(textId);
+    console.log(textVal);
+    taskSchedule[textId] = textVal;
+    updateLocal();
+});
+
 // set the color function to run every 30 seconds and update accordingly
 setInterval(function() {
     colorTimes();
-    console.log("this works");
 }, 30000);
 
 colorTimes();
+setupTask();
